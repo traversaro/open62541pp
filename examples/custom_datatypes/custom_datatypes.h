@@ -4,73 +4,50 @@
 
 #include "open62541pp/open62541pp.h"
 
-// Example struct
-struct Point {
-    float x;
-    float y;
-    float z;
+struct MC_MoveAbsoluteIN {
+    bool execute;
+    double position;
+    double velocity;
+    double acceleration;
+    double deceleration;
+    double jerk;
 };
 
-const opcua::DataType& getPointDataType() {
+struct MC_MoveAbsoluteOUT {
+    bool busy;
+    bool done;
+    bool active;
+    bool error;
+    int errorID;
+    bool commandAborted;
+};
+
+const opcua::DataType& getMcMoveAbsoluteInDataType() {
     static const opcua::DataType dt =
-        opcua::DataTypeBuilder<Point>::createStructure("Point", {1, 4242}, {1, 1})
-            .addField<&Point::x>("x")
-            .addField<&Point::y>("y")
-            .addField<&Point::z>("z")
+        opcua::DataTypeBuilder<MC_MoveAbsoluteIN>::createStructure(
+            "MC_MOVE_ABS_IN", {1, 5001}, {1, 1}
+        )
+            .addField<&MC_MoveAbsoluteIN::execute>("Execute")
+            .addField<&MC_MoveAbsoluteIN::position>("Position")
+            .addField<&MC_MoveAbsoluteIN::velocity>("Velocity")
+            .addField<&MC_MoveAbsoluteIN::acceleration>("Acceleration")
+            .addField<&MC_MoveAbsoluteIN::deceleration>("Deceleration")
+            .addField<&MC_MoveAbsoluteIN::jerk>("Jerk")
             .build();
     return dt;
 }
 
-// Example struct with an array
-struct Measurements {
-    opcua::String description;
-    size_t measurementsSize;
-    float* measurements;
-};
-
-const opcua::DataType& getMeasurementsDataType() {
+const opcua::DataType& getMcMoveAbsoluteOutDataType() {
     static const opcua::DataType dt =
-        opcua::DataTypeBuilder<Measurements>::createStructure("Measurements", {1, 4443}, {1, 2})
-            .addField<&Measurements::description>("description")
-            .addField<&Measurements::measurementsSize, &Measurements::measurements>("measurements")
-            .build();
-    return dt;
-}
-
-// Example struct with optional fields
-struct Opt {
-    int16_t a;
-    float* b;
-    float* c;
-};
-
-const opcua::DataType& getOptDataType() {
-    static const opcua::DataType dt =
-        opcua::DataTypeBuilder<Opt>::createStructure("Opt", {1, 4644}, {1, 3})
-            .addField<&Opt::a>("a")
-            .addField<&Opt::b>("b")
-            .addField<&Opt::c>("c")
-            .build();
-    return dt;
-}
-
-// Example union
-enum class UniSwitch : uint32_t { None = 0, OptionA = 1, OptionB = 2 };
-
-struct Uni {
-    UniSwitch switchField;
-
-    union {
-        double optionA;
-        UA_String optionB;
-    } fields;
-};
-
-const opcua::DataType& getUniDataType() {
-    static const opcua::DataType dt =
-        opcua::DataTypeBuilder<Uni>::createUnion("Uni", {1, 4845}, {1, 4})
-            .addUnionField<&Uni::fields, double>("optionA")
-            .addUnionField<&Uni::fields, UA_String>("optionB", UA_TYPES[UA_TYPES_STRING])
+        opcua::DataTypeBuilder<MC_MoveAbsoluteOUT>::createStructure(
+            "MC_MOVE_ABS_OUT", {1, 5004}, {1, 2}
+        )
+            .addField<&MC_MoveAbsoluteOUT::done>("Done")
+            .addField<&MC_MoveAbsoluteOUT::busy>("Busy")
+            .addField<&MC_MoveAbsoluteOUT::active>("Active")
+            .addField<&MC_MoveAbsoluteOUT::error>("Error")
+            .addField<&MC_MoveAbsoluteOUT::errorID>("Error_ID")
+            .addField<&MC_MoveAbsoluteOUT::commandAborted>("CommandAborted")
             .build();
     return dt;
 }
